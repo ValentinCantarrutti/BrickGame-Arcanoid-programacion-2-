@@ -25,22 +25,28 @@ export default class HelloWorldScene extends Phaser.Scene {
     // create game objects
     this.add.image(400, 300, "sky");
 
-    const logo = this.physics.add.image(400, 100, "logo");
-    logo.setVelocity(100, 200);
-    logo.setBounce(1, 1);
-    logo.setCollideWorldBounds(true);
+    const rect = this.add.rectangle(250, 250, 125, 50, 0xff00022);
 
-    // emmit particles from logo
-    const emitter = this.add.particles(0, 0, "red", {
-      speed: 100,
-      scale: { start: 1, end: 0 },
-      blendMode: "ADD",
-    });
+    this.physics.add.existing(rect);
 
-    emitter.startFollow(logo);
+    this.player = rect;
+
+    this.player.body.setCollideWorldBounds(true);
+
+    this.cursors = this.input.keyboard.createCursorKeys();
   }
 
   update() {
     // update game objects
+const body = this.player.body;
+    
+         if (this.cursors.left.isDown) {
+      body.setVelocityX(-420);
+    } else if (this.cursors.right.isDown) {
+      body.setVelocityX(420);
+    } else {
+      body.setVelocityX(0);
+    }
+
   }
 }
