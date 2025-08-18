@@ -8,7 +8,9 @@ BREAK BRICK es un videojuego en el cual deberas mover la paleta inferior para ha
 
 ## Controles:
 R: para Reiniciar
+
 flecha izquierda: mover la paleta a la izquierda.
+
 flecha derecha: mover la paleta a la derecha.
 
 
