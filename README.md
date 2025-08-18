@@ -1,18 +1,13 @@
-# Phaser 3 Template
+# BREAK BRICK
+Hecho por: Valentín Cantarrutti
+Fecha: 18/08/25
 
-Plantilla para iniciar nuevos proyectos con PHASER 3.
+BREAK BRICK es un videojuego en el cual deberas mover la paleta inferior para hacer rebotar la pelota y destruir las plataformas superiores 
+¡pero cuidado!, que la pelota no toque el fondo o vas a perder.
 
-Contiene configuración inicial y buenas prácticas de estructuras de carpetas.
+## Controles:
+R: para Reiniciar
+flecha izquierda: mover la paleta a la izquierda.
+flecha derecha: mover la paleta a la derecha.
 
-## Cuando lo utilices
 
-No te olvides de customizarlo a tus necesidades.
-
-1. Cuando lo utilices como Template desde el botón de GitHub, no olvides cambiar el nombre del repositorio acorde a tu proyecto en el wizard de creación de repositorios.
-1. Luego de clonar el repositorio en tu maquina local. Deberias:
-   1. Actualizar la version de Phaser a la version más actualizada en el archivo `index.html`. Ver la web: https://phaser.io/download/stable
-   1. También, dentro del `index.html` modificar el titulo de la pagina. Por ejemplo: `<title>My Game</title>`
-   1. Ejecutar el proyecto de forma local para ver que este funcionando correctamente. Si no es asi, deberias lograr que corra.
-   1. Una vez que este funcionando correctamente, hacer un commit con el mensaje "Update Phaser version and title".
-   1. Borrar los archivos dentro de la carpeta `/assets` y empezar a desarrollar.
-1. Por ultimo, una buena practica es: modificar este README.md, poner información relevante de tu juego, imagenes, videos, etc, y luego hacer un commit con el mensaje "Customize README.md".
