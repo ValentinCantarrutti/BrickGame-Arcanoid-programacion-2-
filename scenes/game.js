@@ -1,5 +1,9 @@
 // URL to explain PHASER scene: https://rexrainbow.github.io/phaser3-rex-notes/docs/site/scene/
 
+import Plataforma from "../objects/Plataforma.js";
+import Bloques from "../objects/Bloques.js";
+import Bola from "../objects/Bola.js";
+
 export default class HelloWorldScene extends Phaser.Scene {
   constructor() {
     // key of the scene
@@ -24,127 +28,73 @@ export default class HelloWorldScene extends Phaser.Scene {
   create() {
     // create game objects
 
-    const rect = this.add.rectangle(400, 552, 125, 20, 0xff00022);
+    this.plataforma = new Plataforma(this); // se crea el rectangulo como clase externa
+    this.bloques = new Bloques(this); // se crean los bloques como clase externa
+    this.bola = new Bola(this); // se crea la bola como clase externa
 
-    this.physics.add.existing(rect); // se crea el rectangulo
-    rect.body.setImmovable(true);   // no deja que se mueva por colision
-    rect.body.setCollideWorldBounds(true); // se frena en los bordes de la pantalla
-    this.player = rect; // el rectangulo se vuelve el player
+    this.bloques.forEach((bloque) => {
+      this.physics.add.collider(this.bola.get(), bloque, () => {
+        bloque.destroy(); // la bola elimina el bloque que choca
+      });
+    });
 
-    this.cursors = this.input.keyboard.createCursorKeys(); //se crea las teclas
+    this.physics.add.collider(this.bola.get(), this.plataforma.sprite, (bola, plataforma) => {
+      const diff = bola.x - plataforma.x;
 
-    
-    this.bloques = []; //se crea los bloques
+      // si la bola choca en el centro realiza un rebote vertical
+      if (Math.abs(diff) < 10) {
+        bola.body.setVelocityX(Phaser.Math.Between(-30, 30)); //
+      } else {
+        // si la boca choca en los bordes realiza un rebote más fuerte hacia los lados
+        bola.body.setVelocityX(diff * 5);
+      } //
+    });
 
-const filas = 4;
-const columnas = 6;
-const ancho = 100;
-const alto = 20;
-const espacioX = 120;
-const espacioY = 52;
-const inicioX = 100;
-const inicioY = 55;
+    //mensaje de victoria o derrota
+    this.mensaje = this.add.text(400, 300, "", {
+      fontSize: "32px",
+      color: "#ffffff",
+      backgroundColor: "#000000",
+      padding: { x: 10, y: 5 },
+    }).setOrigin(0.5).setVisible(false);
+    //
 
-for (let fila = 0; fila < filas; fila++) {
-  for (let col = 0; col < columnas; col++) {
-    const x = inicioX + col * espacioX;
-    const y = inicioY + fila * espacioY;
+    //mensaje de reinicio
+    this.reiniciarTexto = this.add.text(400, 350, "Presione R para reiniciar", {
+      fontSize: "24px",
+      color: "#ffffff",
+    }).setOrigin(0.5).setVisible(false);
+    //
+    this.gameOver = false;
 
-    const bloque = this.add.rectangle(x, y, ancho, alto, 0x00ff00);
-    this.physics.add.existing(bloque);
-    bloque.body.setImmovable(true);
-    bloque.body.allowGravity = false;
-
-    this.bloques.push(bloque);
+    //creada derrota si la bola toca el fondo
+    this.physics.world.on("worldbounds", (body, up, down, left, right) => {
+      if (body.gameObject === this.bola.get() && down) {
+        this.bola.destruir();
+        this.physics.pause();
+        this.mensaje.setText("Derrota").setVisible(true);
+        this.reiniciarTexto.setVisible(true);
+        this.gameOver = true;
+      }
+    });
+    //
   }
-}
-//
 
-// se crea la bola
-const bola = this.add.circle(400, 300, 8.5, 0xffffff);
-this.physics.add.existing(bola);
-bola.body.setBounce(1);
-bola.body.setCollideWorldBounds(true);
-bola.body.setVelocity(0, 200);
-this.bola = bola;
-//
-
-bola.body.onWorldBounds = true; //la bola choca con los bordes
-
-this.bloques.forEach((bloque) => {
-  this.physics.add.collider(this.bola, bloque, () => {
-    bloque.destroy(); // la bola elimina el bloque que choca
-  });
-});
-
-
-this.physics.add.collider(this.bola, this.player, (bola, plataforma) => {
-  const diff = bola.x - plataforma.x;
-
-  // si la bola choca en el centro realiza un rebote vertical
-  if (Math.abs(diff) < 10) {
-    bola.body.setVelocityX(Phaser.Math.Between(-30, 30)); //
-  } else {
-    // si la boca choca en los bordes realiza un rebote más fuerte hacia los lados
-    bola.body.setVelocityX(diff * 5);
-  } //
-});
-
-//mensaje de victoria o derrota
-this.mensaje = this.add.text(400, 300, "", {
-  fontSize: "32px",
-  color: "#ffffff",
-  backgroundColor: "#000000",
-  padding: { x: 10, y: 5 },
-}).setOrigin(0.5).setVisible(false);
-//
-
-//mensaje de reinicio
-this.reiniciarTexto = this.add.text(400, 350, "Presione R para reiniciar", {
-  fontSize: "24px",
-  color: "#ffffff",
-}).setOrigin(0.5).setVisible(false);
-//
-this.gameOver = false;
-
-//creada derrota si la bola toca el fondo
-this.physics.world.on("worldbounds", (body, up, down, left, right) => {
-  if (body.gameObject === this.bola && down) {
-    this.bola.destroy();
-    this.physics.pause();
-    this.mensaje.setText("Derrota").setVisible(true);
-    this.reiniciarTexto.setVisible(true);
-    this.gameOver = true;
-  }
-});
-//
-  }
-  
   update() {
     // update game objects
-if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey("R"))) {
-  this.scene.restart();
-} //creada la tecla R
+    if (Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey("R"))) {
+      this.scene.restart();
+    } //creada la tecla R
 
-// la plataforma se mueve hacia los lados
-const body = this.player.body;
-if (this.cursors.left.isDown) {
-  body.setVelocityX(-420);
-} else if (this.cursors.right.isDown) {
-  body.setVelocityX(420);
-} else {
-  body.setVelocityX(0);
-}
-//
+    this.plataforma.update(); // la plataforma se mueve hacia los lados
 
-// creada victoria si se destruyen todas las plataformas
-const bloquesRestantes = this.bloques.filter(b => b.active);
-if (bloquesRestantes.length === 0 && !this.gameOver) {
-  this.physics.pause();
-  this.mensaje.setText("Ganaste").setVisible(true);
-  this.reiniciarTexto.setVisible(true);
-  this.gameOver = true;
-}
-}
-// 
+    // creada victoria si se destruyen todas las plataformas
+    const bloquesRestantes = this.bloques.getActivos();
+    if (bloquesRestantes.length === 0 && !this.gameOver) {
+      this.physics.pause();
+      this.mensaje.setText("Ganaste").setVisible(true);
+      this.reiniciarTexto.setVisible(true);
+      this.gameOver = true;
+    }
+  }
 }
